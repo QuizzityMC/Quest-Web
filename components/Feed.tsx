@@ -1,32 +1,32 @@
-import { useState, useEffect } from 'react'
-import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore'
-import { db } from '../firebase-config'
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useState, useEffect } from 'react';
+import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { db } from '../firebase-config';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export default function Feed({ user }) {
-  const [posts, setPosts] = useState([])
-  const [newPost, setNewPost] = useState('')
+  const [posts, setPosts] = useState([]);
+  const [newPost, setNewPost] = useState('');
 
   useEffect(() => {
-    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'))
+    const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const postsData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
         createdAt: doc.data().createdAt?.toDate().toLocaleString()
-      }))
-      setPosts(postsData)
-    })
+      }));
+      setPosts(postsData);
+    });
 
-    return () => unsubscribe()
-  }, [])
+    return () => unsubscribe();
+  }, []);
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (newPost.trim() === '') return
+    e.preventDefault();
+    if (newPost.trim() === '') return;
 
     try {
       await addDoc(collection(db, 'posts'), {
@@ -34,10 +34,10 @@ export default function Feed({ user }) {
         author: user.displayName || user.email,
         authorId: user.uid,
         createdAt: serverTimestamp(),
-      })
-      setNewPost('')
+      });
+      setNewPost('');
     } catch (error) {
-      console.error('Error adding post: ', error)
+      console.error('Error adding post: ', error);
     }
   }
 
@@ -81,6 +81,5 @@ export default function Feed({ user }) {
         ))}
       </div>
     </div>
-  )
+  );
 }
-
